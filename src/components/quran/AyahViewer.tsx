@@ -6,6 +6,8 @@ interface WaqfData {
   wordIndex: number;
   ruling: string;
   explanation: string;
+  hukumIbtida?: string;
+  taalil?: string;
   type?: string;
   source?: string;
 }
@@ -59,7 +61,7 @@ export default function AyahViewer({ text, waqfPoints, mode }: AyahViewerProps) 
           style={{
             marginTop: '1.5rem',
             padding: '1.5rem',
-            backgroundColor: 'var(--bg-color)',
+            backgroundColor: '#fdfdfd',
             borderRadius: '12px',
             border: '2px solid var(--secondary-color)',
             position: 'relative'
@@ -72,16 +74,27 @@ export default function AyahViewer({ text, waqfPoints, mode }: AyahViewerProps) 
             ×
           </button>
           
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-            <span style={{ 
-              backgroundColor: 'var(--primary-color)', 
-              color: 'white', 
-              padding: '0.2rem 1rem', 
-              borderRadius: '20px',
-              fontSize: '0.9rem'
-            }}>
-              {selectedWaqf.ruling}
-            </span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <span style={{ 
+                backgroundColor: 'var(--primary-color)', 
+                color: 'white', 
+                padding: '0.2rem 1rem', 
+                borderRadius: '20px',
+                fontSize: '0.9rem'
+              }}>
+                الوقف: {selectedWaqf.ruling}
+              </span>
+              <span style={{ 
+                backgroundColor: 'var(--secondary-color)', 
+                color: 'white', 
+                padding: '0.2rem 1rem', 
+                borderRadius: '20px',
+                fontSize: '0.9rem'
+              }}>
+                الابتداء: {selectedWaqf.hukumIbtida}
+              </span>
+            </div>
             {mode === 'specialist' && selectedWaqf.source && (
               <span style={{ color: 'var(--secondary-color)', fontWeight: 'bold' }}>
                 المصدر: {selectedWaqf.source}
@@ -89,13 +102,26 @@ export default function AyahViewer({ text, waqfPoints, mode }: AyahViewerProps) 
             )}
           </div>
 
-          <p style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>
+          <p style={{ fontSize: '1.1rem', marginBottom: '1rem', fontWeight: 'bold', color: 'var(--primary-color)' }}>
+            الشرح المبسط:
+          </p>
+          <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem' }}>
             {selectedWaqf.explanation}
           </p>
 
-          {mode === 'specialist' && selectedWaqf.type && (
-            <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '1rem', marginTop: '1rem', fontSize: '0.9rem', color: '#666' }}>
-              <strong>نوع الوقف:</strong> {selectedWaqf.type}
+          {mode === 'specialist' && (
+            <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '1rem', marginTop: '1rem' }}>
+              {selectedWaqf.taalil && (
+                <div style={{ marginBottom: '1rem' }}>
+                  <p style={{ fontWeight: 'bold', color: '#444', marginBottom: '0.3rem' }}>التعليل العلمي:</p>
+                  <p style={{ fontSize: '1rem', color: '#666' }}>{selectedWaqf.taalil}</p>
+                </div>
+              )}
+              {selectedWaqf.type && (
+                <div style={{ fontSize: '0.9rem', color: '#666' }}>
+                  <strong>نوع الوقف:</strong> {selectedWaqf.type}
+                </div>
+              )}
             </div>
           )}
         </div>

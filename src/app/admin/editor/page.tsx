@@ -4,12 +4,13 @@ import React, { useState, useEffect } from 'react';
 import { Save, Plus, Trash2, Eye, ChevronRight, ChevronLeft } from 'lucide-react';
 
 export default function WaqfEditor() {
-  const [selectedWordIdx, setSelectedWordIdx] = useState<number | null>(null);
   const [formData, setFormData] = useState({
-    methodology: 'مصحf المدينة',
-    ruling: 'جائز',
+    methodology: 'MADINA',
+    ruling: 'وقف تام',
+    hukumIbtida: 'جائز',
     source: '',
     explanation: '',
+    taalil: '',
     status: 'DRAFT'
   });
 
@@ -49,7 +50,9 @@ export default function WaqfEditor() {
         status: formData.status,
         data: JSON.stringify({
           ruling: formData.ruling,
+          hukumIbtida: formData.hukumIbtida,
           explanation: formData.explanation,
+          taalil: formData.taalil,
           source: formData.source
         })
       };
@@ -209,6 +212,21 @@ export default function WaqfEditor() {
             </div>
 
             <div>
+              <label style={{ display: 'block', marginBottom: '0.5rem' }}>حكم الابتداء</label>
+              <select 
+                className="btn btn-outline" 
+                style={{ width: '100%', textAlign: 'right' }}
+                value={formData.hukumIbtida}
+                onChange={(e) => setFormData({...formData, hukumIbtida: e.target.value})}
+              >
+                <option>جائز</option>
+                <option>كاف</option>
+                <option>تام</option>
+                <option>قبيح</option>
+              </select>
+            </div>
+
+            <div>
               <label style={{ display: 'block', marginBottom: '0.5rem' }}>المصدر العلمي</label>
               <input 
                 type="text" 
@@ -220,7 +238,29 @@ export default function WaqfEditor() {
               />
             </div>
 
-            <div>
+            <div style={{ gridColumn: 'span 2' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem' }}>الشرح المبسط (للطالب)</label>
+              <textarea 
+                className="btn btn-outline"
+                style={{ width: '100%', minHeight: '80px', padding: '1rem', textAlign: 'right', height: 'auto' }}
+                placeholder="اشرح سبب الوقف هنا للطلاب..."
+                value={formData.explanation}
+                onChange={(e) => setFormData({...formData, explanation: e.target.value})}
+              ></textarea>
+            </div>
+
+            <div style={{ gridColumn: 'span 2' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem' }}>التعليل العلمي (للمتخصص)</label>
+              <textarea 
+                className="btn btn-outline"
+                style={{ width: '100%', minHeight: '80px', padding: '1rem', textAlign: 'right', height: 'auto' }}
+                placeholder="التفصيل العلمي والأوجه النحوية..."
+                value={formData.taalil}
+                onChange={(e) => setFormData({...formData, taalil: e.target.value})}
+              ></textarea>
+            </div>
+
+            <div style={{ gridColumn: 'span 2' }}>
               <label style={{ display: 'block', marginBottom: '0.5rem' }}>حالة المراجعة</label>
               <select 
                 className="btn btn-outline" 
@@ -231,17 +271,6 @@ export default function WaqfEditor() {
                 <option value="DRAFT">مسودة (Draft)</option>
                 <option value="APPROVED">معتمد (Approved)</option>
               </select>
-            </div>
-
-            <div style={{ gridColumn: 'span 2' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem' }}>شرح الطالب</label>
-              <textarea 
-                className="btn btn-outline"
-                style={{ width: '100%', minHeight: '120px', padding: '1rem', textAlign: 'right', height: 'auto' }}
-                placeholder="اشرح سبب الوقف هنا للطلاب..."
-                value={formData.explanation}
-                onChange={(e) => setFormData({...formData, explanation: e.target.value})}
-              ></textarea>
             </div>
           </div>
         </div>
