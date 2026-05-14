@@ -35,10 +35,10 @@ export default function SearchPage() {
     const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
     try {
-      // Search by Surah Name, Number or Ayah Text + Join with WaqfPoints
+      // Search by Surah Name, Number or Ayah Text + Join with WaqfPoint (Corrected name)
       const searchUrl = isNaN(parseInt(query)) 
-        ? `${SUPABASE_URL}/rest/v1/Ayah?select=*,Surah(name),WaqfPoints(*)&textSimple=ilike.*${normalizeArabic(query)}*&limit=20`
-        : `${SUPABASE_URL}/rest/v1/Ayah?select=*,Surah(name),WaqfPoints(*)&surahNumber=eq.${query}&limit=50`;
+        ? `${SUPABASE_URL}/rest/v1/Ayah?select=*,Surah(name),WaqfPoint(*)&textSimple=ilike.*${normalizeArabic(query)}*&limit=20`
+        : `${SUPABASE_URL}/rest/v1/Ayah?select=*,Surah(name),WaqfPoint(*)&surahNumber=eq.${query}&limit=50`;
 
       const response = await fetch(searchUrl, {
         headers: {
@@ -50,11 +50,11 @@ export default function SearchPage() {
       const data = await response.json();
       
       // Transform data for the view
-      const formatted = data.map((item: any) => ({
+      const formatted = (Array.isArray(data) ? data : []).map((item: any) => ({
         surah: item.Surah?.name || item.surahNumber,
         number: item.number,
         text: item.textOthmani,
-        waqfPoints: (item.WaqfPoints || []).map((p: any) => {
+        waqfPoints: (item.WaqfPoint || []).map((p: any) => {
            // Parse JSON data stored in the 'data' column
            const extraData = JSON.parse(p.data || '{}');
            return {
