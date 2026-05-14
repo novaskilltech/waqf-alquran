@@ -24,21 +24,28 @@ export default function AyahViewer({ text, waqfPoints, mode }: AyahViewerProps) 
 
   return (
     <div className="card" style={{ position: 'relative' }}>
-      <div className="quran-text">
+      <div className="quran-text" style={{ lineHeight: '2.5', fontSize: '1.8rem' }}>
         {words.map((word, index) => {
           const waqf = waqfPoints.find(p => p.wordIndex === index);
+          const isSelected = selectedWaqf === waqf;
+          
           return (
             <React.Fragment key={index}>
-              <span>{word}</span>
-              {waqf && (
-                <span 
-                  className="waqf-mark" 
-                  onClick={() => setSelectedWaqf(waqf)}
-                  title={waqf.ruling}
-                >
-                  *
-                </span>
-              )}
+              <span 
+                onClick={() => waqf && setSelectedWaqf(waqf)}
+                style={{ 
+                  cursor: waqf ? 'pointer' : 'default',
+                  color: waqf ? 'var(--accent-color)' : 'inherit',
+                  fontWeight: waqf ? 'bold' : 'normal',
+                  padding: '0 2px',
+                  borderRadius: '4px',
+                  backgroundColor: isSelected ? 'rgba(212, 175, 55, 0.1)' : 'transparent',
+                  borderBottom: waqf ? '2px dotted var(--accent-color)' : 'none',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                {word}
+              </span>
               {' '}
             </React.Fragment>
           );
