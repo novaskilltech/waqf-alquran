@@ -28,13 +28,39 @@ export default function SearchPage() {
   const [results, setResults] = useState<typeof MOCK_DATA>([]);
   const [mode] = useState<'student' | 'specialist'>('student'); // Should be from context/url
 
-  const handleSearch = () => {
-    const normalizedQuery = normalizeArabic(query);
-    const filtered = MOCK_DATA.filter(item => 
-      normalizeArabic(item.text).includes(normalizedQuery) || 
-      item.surah.includes(query)
-    );
-    setResults(filtered);
+  const handleSearch = async () => {
+    if (!query) return;
+    
+    const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    try {
+      // Search by Surah Name, Number or Ayah Text
+      const searchUrl = isNaN(parseInt(query)) 
+        ? `${SUPABASE_URL}/rest/v1/Ayah?select=*,Surah(name)&textSimple=ilike.*${normalizeArabic(query)}*&limit=20`
+        : `${SUPABASE_URL}/rest/v1/Ayah?select=*,Surah(name)&surahNumber=eq.${query}&limit=50`;
+
+      const response = await fetch(searchUrl, {
+        headers: {
+          'apikey': SUPABASE_KEY || '',
+          'Authorization': `Bearer ${SUPABASE_KEY}`
+        }
+      });
+
+      const data = await response.json();
+      
+      // Transform data for the view
+      const formatted = data.map((item: any) => ({
+        surah: item.Surah?.name || item.surahNumber,
+        number: item.number,
+        text: item.textOthmani,
+        waqfPoints: [] // Will be fetched via a join or secondary call if needed
+      }));
+
+      setResults(formatted);
+    } catch (error) {
+      console.error('Search error:', error);
+    }
   };
 
   return (
