@@ -5,12 +5,32 @@ import Link from 'next/link';
 import { BookOpen, Search, ShieldCheck, BarChart3, Settings } from 'lucide-react';
 
 export default function HomePage() {
-  const [stats, setStats] = useState({ total: 0, approved: 0, surahs: 65 });
+  const [stats, setStats] = useState({ total: 0, approved: 0, surahs: 114 });
 
-  // Simulation de récupération de stats réelles
   useEffect(() => {
-    // Dans un vrai cas, on ferait un fetch vers /api/stats
-    setStats({ total: 12, approved: 5, surahs: 65 });
+    const fetchStats = async () => {
+      const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      
+      try {
+        const [resPoints, resApproved] = await Promise.all([
+          fetch(`${SUPABASE_URL}/rest/v1/WaqfPoint?select=count`, { headers: { 'apikey': SUPABASE_KEY, 'Prefer': 'count=exact' } }),
+          fetch(`${SUPABASE_URL}/rest/v1/WaqfPoint?status=eq.APPROVED&select=count`, { headers: { 'apikey': SUPABASE_KEY, 'Prefer': 'count=exact' } })
+        ]);
+        
+        const countPoints = await resPoints.json();
+        const countApproved = await resApproved.json();
+        
+        setStats({
+          total: countPoints[0]?.count || 0,
+          approved: countApproved[0]?.count || 0,
+          surahs: 114
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    fetchStats();
   }, []);
 
   return (
@@ -59,7 +79,7 @@ export default function HomePage() {
       <div className="card" style={{ background: 'var(--primary-color)', color: 'white' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
           <BarChart3 />
-          <h3>إحصائيات المشروع (ق - الناس)</h3>
+          <h3>إحصائيات المشروع (القرآن كاملاً)</h3>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', textAlign: 'center' }}>
           <div>

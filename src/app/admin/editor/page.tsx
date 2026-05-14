@@ -4,7 +4,16 @@ import React, { useState, useEffect } from 'react';
 import { Save, Plus, Trash2, Eye, ChevronRight, ChevronLeft } from 'lucide-react';
 
 export default function WaqfEditor() {
+  const [surahList, setSurahList] = useState([]);
+  const [selectedSurah, setSelectedSurah] = useState('1');
+  const [ayahs, setAyahs] = useState([]);
+  const [currentAyahIdx, setCurrentAyahIdx] = useState(0);
+  const [selectedWordIdx, setSelectedWordIdx] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [waqfPoints, setWaqfPoints] = useState([]);
+
   const [formData, setFormData] = useState({
+    id: null,
     methodology: 'MADINA',
     ruling: 'وقف تام',
     hukumIbtida: 'جائز',
@@ -35,6 +44,60 @@ export default function WaqfEditor() {
     }
   }, [selectedSurah]);
 
+  // Fetch existing Waqf Points for the current Ayah
+  useEffect(() => {
+    const fetchExistingPoints = async () => {
+      if (!currentAyah) return;
+      
+      const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      const ayahId = `s${selectedSurah}a${currentAyah.number}`;
+
+      try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/WaqfPoint?ayahId=eq.${ayahId}`, {
+          headers: {
+            'apikey': SUPABASE_KEY || '',
+            'Authorization': `Bearer ${SUPABASE_KEY}`
+          }
+        });
+        const data = await response.json();
+        setWaqfPoints(data || []);
+      } catch (error) {
+        console.error('Fetch existing points error:', error);
+      }
+    };
+
+    fetchExistingPoints();
+  }, [currentAyahIdx, selectedSurah, ayahs]);
+
+  // When a word is selected, load existing data if it exists
+  useEffect(() => {
+    if (selectedWordIdx !== null) {
+      const existing = waqfPoints.find(p => p.wordIndex === selectedWordIdx);
+      if (existing) {
+        const extraData = JSON.parse(existing.data || '{}');
+        setFormData({
+          id: existing.id,
+          methodology: existing.methodology,
+          ruling: extraData.ruling || 'وقف تام',
+          hukumIbtida: extraData.hukumIbtida || 'جائز',
+          source: extraData.source || '',
+          explanation: extraData.explanation || '',
+          taalil: extraData.taalil || '',
+          status: existing.status
+        });
+      } else {
+        setFormData(prev => ({
+          ...prev,
+          id: null,
+          explanation: '',
+          taalil: '',
+          source: ''
+        }));
+      }
+    }
+  }, [selectedWordIdx, waqfPoints]);
+
   const handleSave = async () => {
     if (selectedWordIdx === null || !currentAyah) return;
     
@@ -44,6 +107,7 @@ export default function WaqfEditor() {
       const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
       
       const payload = {
+        id: formData.id || undefined,
         ayahId: `s${selectedSurah}a${currentAyah.number}`,
         wordIndex: selectedWordIdx,
         methodology: formData.methodology,
@@ -57,8 +121,8 @@ export default function WaqfEditor() {
         })
       };
 
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/WaqfPoint`, {
-        method: 'POST',
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/WaqfPoint${formData.id ? `?id=eq.${formData.id}` : ''}`, {
+        method: formData.id ? 'PATCH' : 'POST',
         headers: {
           'apikey': SUPABASE_KEY || '',
           'Authorization': `Bearer ${SUPABASE_KEY}`,
@@ -70,12 +134,21 @@ export default function WaqfEditor() {
 
       if (response.ok) {
         alert('✅ تم حفظ موضع الوقف بنجاح');
+        const updatedResponse = await fetch(`${SUPABASE_URL}/rest/v1/WaqfPoint?ayahId=eq.${payload.ayahId}`, {
+          headers: {
+            'apikey': SUPABASE_KEY || '',
+            'Authorization': `Bearer ${SUPABASE_KEY}`
+          }
+        });
+        const updatedData = await updatedResponse.json();
+        setWaqfPoints(updatedData);
       } else {
-        const err = await response.text();
-        alert('❌ خطأ في الحفظ: ' + err);
+        const err = await response.json();
+        alert('❌ خطأ في الحفظ: ' + (err.message || JSON.stringify(err)));
       }
     } catch (error) {
       console.error('Save error:', error);
+      alert('💥 حدث خطأ في الاتصال بالخادم');
     } finally {
       setIsSaving(false);
     }
@@ -98,13 +171,12 @@ export default function WaqfEditor() {
             disabled={isSaving || selectedWordIdx === null}
           >
             <Save size={18} style={{ marginLeft: '0.5rem' }} />
-            {isSaving ? 'جاري الحفظ...' : 'حفظ الموضع'}
+            {isSaving ? 'جاري الحفظ...' : formData.id ? 'تحديث الموضع' : 'حفظ الموضع'}
           </button>
         </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '2rem' }}>
-        {/* Selection & Controls */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div className="card">
             <h3 style={{ marginBottom: '1rem' }}>اختيار الموضع</h3>
@@ -155,25 +227,6 @@ export default function WaqfEditor() {
           <div className="card">
             <h3 style={{ marginBottom: '1rem' }}>نص الآية</h3>
             <div className="quran-text" style={{ fontSize: '1.5rem', padding: '1rem', lineHeight: '2.5' }}>
-              {currentAyah?.text.split(' ').map((word, i) => (
-                <span 
-                  key={i} 
-                  onClick={() => setSelectedWordIdx(i)}
-                  style={{ 
-                    cursor: 'pointer',
-                    padding: '0 4px',
-                    borderRadius: '4px',
-                    backgroundColor: selectedWordIdx === i ? 'var(--accent-color)' : 'transparent',
-                    transition: 'background 0.2s'
-                  }}
-                >
-                  {word}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-
         {/* Data Entry Form */}
         <div className="card">
           <h3 style={{ marginBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
