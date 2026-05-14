@@ -19,34 +19,56 @@ interface AyahViewerProps {
 }
 
 export default function AyahViewer({ text, waqfPoints, mode }: AyahViewerProps) {
-  const [selectedWaqf, setSelectedWaqf] = useState<WaqfData | null>(null);
+  const [selectedWordIdx, setSelectedWordIdx] = useState<number | null>(null);
   
-  // Split text into words to insert Waqf marks at specific indices
+  // Split text into words
   const words = text.split(' ');
+
+  // Get all waqf points for the selected word
+  const currentPoints = selectedWordIdx !== null 
+    ? waqfPoints.filter(p => p.wordIndex === selectedWordIdx)
+    : [];
+
+  const getMethodColor = (m: string) => {
+    if (m === 'MADINA') return '#1e40af'; // Blue
+    if (m === 'HABTI') return '#15803d'; // Green
+    if (m === 'BOOKS') return '#b45309'; // Amber
+    return 'var(--accent-color)';
+  };
 
   return (
     <div className="card" style={{ position: 'relative' }}>
       <div className="quran-text" style={{ lineHeight: '2.5', fontSize: '1.8rem' }}>
         {words.map((word, index) => {
-          const waqf = waqfPoints.find(p => p.wordIndex === index);
-          const isSelected = selectedWaqf === waqf;
+          const points = waqfPoints.filter(p => p.wordIndex === index);
+          const hasPoints = points.length > 0;
+          const isSelected = selectedWordIdx === index;
           
           return (
             <React.Fragment key={index}>
               <span 
-                onClick={() => waqf && setSelectedWaqf(waqf)}
+                onClick={() => hasPoints && setSelectedWordIdx(index)}
                 style={{ 
-                  cursor: waqf ? 'pointer' : 'default',
-                  color: waqf ? 'var(--accent-color)' : 'inherit',
-                  fontWeight: waqf ? 'bold' : 'normal',
+                  cursor: hasPoints ? 'pointer' : 'default',
+                  color: hasPoints ? 'inherit' : 'inherit',
+                  fontWeight: hasPoints ? 'bold' : 'normal',
                   padding: '0 2px',
                   borderRadius: '4px',
                   backgroundColor: isSelected ? 'rgba(212, 175, 55, 0.1)' : 'transparent',
-                  borderBottom: waqf ? '2px dotted var(--accent-color)' : 'none',
+                  // Highlight with multiple underlines if multiple methods
+                  borderBottom: hasPoints 
+                    ? `3px double ${getMethodColor(points[0].methodology)}` 
+                    : 'none',
                   transition: 'all 0.3s ease'
                 }}
               >
                 {word}
+                {/* Small indicator dots for methods */}
+                {hasPoints && points.length > 1 && (
+                   <span style={{ fontSize: '0.8rem', verticalAlign: 'super', marginRight: '2px' }}>
+                     ({points.length})
+                   </span>
+                )}
               </span>
               {' '}
             </React.Fragment>
@@ -54,8 +76,8 @@ export default function AyahViewer({ text, waqfPoints, mode }: AyahViewerProps) 
         })}
       </div>
 
-      {/* Popover / Card for Waqf Details */}
-      {selectedWaqf && (
+      {/* Comparison Detail Card */}
+      {selectedWordIdx !== null && currentPoints.length > 0 && (
         <div 
           className="animate-fade"
           style={{
@@ -68,62 +90,49 @@ export default function AyahViewer({ text, waqfPoints, mode }: AyahViewerProps) 
           }}
         >
           <button 
-            onClick={() => setSelectedWaqf(null)}
+            onClick={() => setSelectedWordIdx(null)}
             style={{ position: 'absolute', top: '10px', left: '10px', border: 'none', background: 'none', cursor: 'pointer', fontSize: '1.2rem' }}
           >
             ×
           </button>
           
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <span style={{ 
-                backgroundColor: 'var(--primary-color)', 
-                color: 'white', 
-                padding: '0.2rem 1rem', 
-                borderRadius: '20px',
-                fontSize: '0.9rem'
+          <h3 style={{ color: 'var(--primary-color)', marginBottom: '1rem', textAlign: 'center' }}>
+            مقارنة المناهج العلمية (الكلمة: {words[selectedWordIdx]})
+          </h3>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {currentPoints.map((p, idx) => (
+              <div key={idx} style={{ 
+                border: `1px solid ${getMethodColor(p.methodology)}`, 
+                borderRadius: '8px', 
+                padding: '1rem',
+                backgroundColor: 'white'
               }}>
-                الوقف: {selectedWaqf.ruling}
-              </span>
-              <span style={{ 
-                backgroundColor: 'var(--secondary-color)', 
-                color: 'white', 
-                padding: '0.2rem 1rem', 
-                borderRadius: '20px',
-                fontSize: '0.9rem'
-              }}>
-                الابتداء: {selectedWaqf.hukumIbtida}
-              </span>
-            </div>
-            {mode === 'specialist' && selectedWaqf.source && (
-              <span style={{ color: 'var(--secondary-color)', fontWeight: 'bold' }}>
-                المصدر: {selectedWaqf.source}
-              </span>
-            )}
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.8rem' }}>
+                  <span style={{ 
+                    backgroundColor: getMethodColor(p.methodology), 
+                    color: 'white', 
+                    padding: '0.2rem 1rem', 
+                    borderRadius: '4px',
+                    fontSize: '0.8rem',
+                    fontWeight: 'bold'
+                  }}>
+                    {p.methodology === 'MADINA' ? 'مصحف المدينة' : p.methodology === 'HABTI' ? 'وقف الهبطي' : 'كتب الوقف'}
+                  </span>
+                  <span style={{ color: '#666', fontSize: '0.9rem' }}>الوقف: <strong>{p.ruling}</strong></span>
+                </div>
+
+                <p style={{ fontSize: '1rem', margin: '0.5rem 0' }}>{p.explanation}</p>
+                
+                {mode === 'specialist' && (
+                  <div style={{ marginTop: '0.5rem', fontSize: '0.9rem', color: '#666', borderTop: '1px dashed #eee', paddingTop: '0.5rem' }}>
+                    <strong>التعليل:</strong> {p.taalil} <br/>
+                    <strong>المصدر:</strong> {p.source}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
-
-          <p style={{ fontSize: '1.1rem', marginBottom: '1rem', fontWeight: 'bold', color: 'var(--primary-color)' }}>
-            الشرح المبسط:
-          </p>
-          <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem' }}>
-            {selectedWaqf.explanation}
-          </p>
-
-          {mode === 'specialist' && (
-            <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '1rem', marginTop: '1rem' }}>
-              {selectedWaqf.taalil && (
-                <div style={{ marginBottom: '1rem' }}>
-                  <p style={{ fontWeight: 'bold', color: '#444', marginBottom: '0.3rem' }}>التعليل العلمي:</p>
-                  <p style={{ fontSize: '1rem', color: '#666' }}>{selectedWaqf.taalil}</p>
-                </div>
-              )}
-              {selectedWaqf.type && (
-                <div style={{ fontSize: '0.9rem', color: '#666' }}>
-                  <strong>نوع الوقف:</strong> {selectedWaqf.type}
-                </div>
-              )}
-            </div>
-          )}
         </div>
       )}
     </div>

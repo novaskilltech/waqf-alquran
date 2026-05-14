@@ -36,11 +36,10 @@ export default function SearchPage() {
     const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
     try {
-      // US-05: Enforce status=eq.APPROVED on the join to prevent leaking drafts
-      const filters = `status=eq.APPROVED,methodology=eq.${methodology}`;
+      // Fetch ALL methodologies to allow comparison
       const searchUrl = isNaN(parseInt(query)) 
-        ? `${SUPABASE_URL}/rest/v1/Ayah?select=*,Surah(name),WaqfPoint(*)&textSimple=ilike.*${normalizeArabic(query)}*&WaqfPoint.status=eq.APPROVED&WaqfPoint.methodology=eq.${methodology}&limit=20`
-        : `${SUPABASE_URL}/rest/v1/Ayah?select=*,Surah(name),WaqfPoint(*)&surahNumber=eq.${query}&WaqfPoint.status=eq.APPROVED&WaqfPoint.methodology=eq.${methodology}&limit=50`;
+        ? `${SUPABASE_URL}/rest/v1/Ayah?select=*,Surah(name),WaqfPoint(*)&textSimple=ilike.*${normalizeArabic(query)}*&WaqfPoint.status=eq.APPROVED&limit=20`
+        : `${SUPABASE_URL}/rest/v1/Ayah?select=*,Surah(name),WaqfPoint(*)&surahNumber=eq.${query}&WaqfPoint.status=eq.APPROVED&limit=50`;
 
       const response = await fetch(searchUrl, {
         headers: {
@@ -58,7 +57,9 @@ export default function SearchPage() {
         waqfPoints: (item.WaqfPoint || []).map((p: any) => {
            const extraData = JSON.parse(p.data || '{}');
            return {
+             id: p.id,
              wordIndex: p.wordIndex,
+             methodology: p.methodology, // Important for grouping
              ruling: extraData.ruling || 'غير محدد',
              explanation: extraData.explanation || 'لا يوجد شرح',
              type: p.methodology,
