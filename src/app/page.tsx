@@ -43,7 +43,22 @@ export default function HomePage() {
         </p>
       </header>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginBottom: '4rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', marginBottom: '4rem' }}>
+        {/* Mushaf Experience */}
+        <Link href="/mushaf" style={{ textDecoration: 'none' }}>
+          <div className="card hover-scale" style={{ height: '100%', borderTop: '4px solid #d4af37' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+              <div style={{ background: '#fff9f0', padding: '0.8rem', borderRadius: '12px', border: '1px solid #d4af37' }}>
+                <BookOpen color="#d4af37" />
+              </div>
+              <h2 style={{ color: '#d4af37' }}>المصحف الشريف</h2>
+            </div>
+            <p style={{ color: '#666', lineHeight: '1.6' }}>
+              تصفح القرآن الكريم بتنسيق المصحف التقليدي وتفاعل مع علامات الوقف مباشرة.
+            </p>
+          </div>
+        </Link>
+
         {/* Accès Public */}
         <Link href="/search" style={{ textDecoration: 'none' }}>
           <div className="card hover-scale" style={{ height: '100%', borderTop: '4px solid var(--primary-color)' }}>
@@ -54,7 +69,7 @@ export default function HomePage() {
               <h2 style={{ color: 'var(--primary-color)' }}>مُحرك البحث</h2>
             </div>
             <p style={{ color: '#666', lineHeight: '1.6' }}>
-              استعرض مواضع الوقف المعتمدة مع التفسير العلمي المبسط للطلاب والباحثين.
+              ابحث عن آيات أو كلمات محددة واستعرض الأحكام العلمية المفصلة.
             </p>
           </div>
         </Link>
@@ -69,7 +84,7 @@ export default function HomePage() {
               <h2 style={{ color: 'var(--secondary-color)' }}>الورشة العلمية</h2>
             </div>
             <p style={{ color: '#666', lineHeight: '1.6' }}>
-              لوحة التحكم الخاصة بالخبراء لإضافة وتدقيق مواضع الوقف وتوثيق المصادر.
+              لوحة التحكم الخاصة بالخبراء لإضافة وتدقيق مواضع الوقف وتوثiq المصادر.
             </p>
           </div>
         </Link>
