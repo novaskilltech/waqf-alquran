@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Surah {
+  number   Int    @id
+  name     String
+  type     String
+  ayahs    Ayah[]
+}
+
+model Ayah {
+  id          String      @id
+  number      Int
+  surahNumber Int
+  surah       Surah       @relation(fields: [surahNumber], references: [number])
+  textOthmani String
+  textSimple  String
+  waqfPoints  WaqfPoint[]
+}
+
+model WaqfPoint {
+  id             String   @id @default(cuid())
+  ayahId         String
+  ayah           Ayah     @relation(fields: [ayahId], references: [id])
+  wordIndex      Int
+  methodology    String
+  ruling         String
+  explanation    String
+  specialistNote String?
+  status         String   @default("DRAFT") // DRAFT, REVIEW, APPROVED
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  data           Json?
+}

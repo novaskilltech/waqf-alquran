@@ -1,0 +1,28 @@
+{
+  "name": "waqf-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 4000 --webpack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "import-quran": "node prisma/import-quran.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.10.0",
+    "lucide-react": "latest",
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "eslint": "latest",
+    "eslint-config-next": "latest",
+    "prisma": "^5.10.0",
+    "typescript": "latest"
+  }
+}

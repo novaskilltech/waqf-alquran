@@ -1,0 +1,184 @@
+:root {
+  --primary-color: #0b3d2e;
+  --primary-light: #165c47;
+  --secondary-color: #c19a6b;
+  --accent-color: #d4af37;
+  --bg-color: #fdfaf1;
+  --text-color: #1a1a1a;
+  --card-bg: #ffffff;
+  --border-color: #e2dcc8;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --font-main: 'Cairo', sans-serif;
+  --font-quran: 'Amiri', serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: var(--font-main);
+  line-height: 1.6;
+  direction: rtl;
+}
+
+/* Quranic Typography */
+.quran-text {
+  font-family: var(--font-quran);
+  font-size: 2.5rem;
+  line-height: 2.2;
+  text-align: justify;
+  text-align-last: center;
+  color: var(--primary-color);
+  padding: 2rem;
+}
+
+.waqf-mark {
+  color: var(--secondary-color);
+  font-size: 1.2rem;
+  margin: 0 0.2rem;
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.waqf-mark:hover {
+  background-color: rgba(193, 154, 107, 0.1);
+  transform: scale(1.2);
+}
+
+/* Premium Layout */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.header {
+  text-align: center;
+  padding: 3rem 1rem;
+  background: linear-gradient(to bottom, #f5f0e1, var(--bg-color));
+}
+
+.title {
+  color: var(--primary-color);
+  font-family: var(--font-quran);
+  font-size: 3.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.subtitle {
+  color: var(--secondary-color);
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--secondary-color);
+}
+
+/* Buttons & Navigation */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.8rem 2rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  border: none;
+  font-size: 1rem;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-light);
+  transform: translateY(-2px);
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
+}
+
+.btn-outline:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.hover-scale {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.hover-scale:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+  .title {
+    font-size: 2.5rem;
+  }
+  
+  .quran-text {
+    font-size: 1.8rem;
+    padding: 1rem;
+    line-height: 2.5;
+  }
+
+  .waqf-mark {
+    width: 32px; /* Plus grand pour le tactile */
+    height: 32px;
+    font-size: 1.5rem;
+  }
+
+  .card {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+
+  .btn {
+    padding: 0.6rem 1.2rem;
+  }
+}
