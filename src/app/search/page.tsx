@@ -35,10 +35,10 @@ export default function SearchPage() {
     const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
     try {
-      // Search by Surah Name, Number or Ayah Text
+      // Search by Surah Name, Number or Ayah Text + Join with WaqfPoints
       const searchUrl = isNaN(parseInt(query)) 
-        ? `${SUPABASE_URL}/rest/v1/Ayah?select=*,Surah(name)&textSimple=ilike.*${normalizeArabic(query)}*&limit=20`
-        : `${SUPABASE_URL}/rest/v1/Ayah?select=*,Surah(name)&surahNumber=eq.${query}&limit=50`;
+        ? `${SUPABASE_URL}/rest/v1/Ayah?select=*,Surah(name),WaqfPoints(*)&textSimple=ilike.*${normalizeArabic(query)}*&limit=20`
+        : `${SUPABASE_URL}/rest/v1/Ayah?select=*,Surah(name),WaqfPoints(*)&surahNumber=eq.${query}&limit=50`;
 
       const response = await fetch(searchUrl, {
         headers: {
@@ -54,7 +54,17 @@ export default function SearchPage() {
         surah: item.Surah?.name || item.surahNumber,
         number: item.number,
         text: item.textOthmani,
-        waqfPoints: [] // Will be fetched via a join or secondary call if needed
+        waqfPoints: (item.WaqfPoints || []).map((p: any) => {
+           // Parse JSON data stored in the 'data' column
+           const extraData = JSON.parse(p.data || '{}');
+           return {
+             wordIndex: p.wordIndex,
+             ruling: extraData.ruling || 'غير محدد',
+             explanation: extraData.explanation || 'لا يوجد شرح',
+             type: p.methodology,
+             source: extraData.source
+           };
+        })
       }));
 
       setResults(formatted);
