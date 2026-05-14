@@ -4,13 +4,13 @@ import React, { useState, useEffect } from 'react';
 import { Save, Plus, Trash2, Eye, ChevronRight, ChevronLeft } from 'lucide-react';
 
 export default function WaqfEditor() {
-  const [surahList, setSurahList] = useState([]);
+  const [surahList, setSurahList] = useState<any[]>([]);
   const [selectedSurah, setSelectedSurah] = useState('1');
-  const [ayahs, setAyahs] = useState([]);
+  const [ayahs, setAyahs] = useState<any[]>([]);
   const [currentAyahIdx, setCurrentAyahIdx] = useState(0);
-  const [selectedWordIdx, setSelectedWordIdx] = useState(null);
+  const [selectedWordIdx, setSelectedWordIdx] = useState<number | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [waqfPoints, setWaqfPoints] = useState([]);
+  const [waqfPoints, setWaqfPoints] = useState<any[]>([]);
 
   const [formData, setFormData] = useState({
     id: null,
@@ -22,6 +22,8 @@ export default function WaqfEditor() {
     taalil: '',
     status: 'DRAFT'
   });
+
+  const currentAyah = ayahs[currentAyahIdx];
 
   // Fetch Surah List
   useEffect(() => {
@@ -154,8 +156,6 @@ export default function WaqfEditor() {
     }
   };
 
-  const currentAyah = ayahs[currentAyahIdx];
-
   return (
     <div className="animate-fade">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
@@ -189,7 +189,7 @@ export default function WaqfEditor() {
                   value={selectedSurah}
                   onChange={(e) => setSelectedSurah(e.target.value)}
                 >
-                  {surahList.map(s => (
+                  {surahList.map((s: any) => (
                     <option key={s.number} value={s.number}>
                       {s.number}. {s.name}
                     </option>
@@ -226,14 +226,46 @@ export default function WaqfEditor() {
 
           <div className="card">
             <h3 style={{ marginBottom: '1rem' }}>نص الآية</h3>
-            <div className="quran-text" style={{ fontSize: '1.5rem', padding: '1rem', lineHeight: '2.5' }}>
-        {/* Data Entry Form */}
+            <div className="quran-text" style={{ fontSize: '1.5rem', padding: '1rem', lineHeight: '2.5', textAlign: 'center' }}>
+              {currentAyah?.text.split(' ').map((word: string, idx: number) => {
+                const isSelected = selectedWordIdx === idx;
+                const hasExisting = waqfPoints.some((p: any) => p.wordIndex === idx);
+                
+                return (
+                  <span 
+                    key={idx}
+                    onClick={() => setSelectedWordIdx(idx)}
+                    style={{ 
+                      cursor: 'pointer',
+                      padding: '0 5px',
+                      margin: '0 2px',
+                      borderRadius: '4px',
+                      backgroundColor: isSelected ? 'var(--accent-color)' : 'transparent',
+                      borderBottom: hasExisting ? '2px solid var(--primary-color)' : 'none',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    {word}
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Column 2: Data Entry Form */}
         <div className="card">
           <h3 style={{ marginBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
-            إضافة موضع وقف جديد {selectedWordIdx !== null && `(كلمة: ${currentAyah?.text.split(' ')[selectedWordIdx]})`}
+            {selectedWordIdx !== null ? `تعديل الموضع (كلمة: ${currentAyah?.text.split(' ')[selectedWordIdx]})` : 'اختر كلمة من الآية للبدء'}
           </h3>
           
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: '1fr 1fr', 
+            gap: '1.5rem', 
+            opacity: selectedWordIdx === null ? 0.5 : 1, 
+            pointerEvents: selectedWordIdx === null ? 'none' : 'auto' 
+          }}>
             <div>
               <label style={{ display: 'block', marginBottom: '0.5rem' }}>المنهج</label>
               <select 
@@ -317,7 +349,7 @@ export default function WaqfEditor() {
               <label style={{ display: 'block', marginBottom: '0.5rem' }}>حالة المراجعة</label>
               <select 
                 className="btn btn-outline" 
-                style={{ width: '100%', textAlign: 'right', backgroundColor: '#fff8e1' }}
+                style={{ width: '100%', textAlign: 'right' }}
                 value={formData.status}
                 onChange={(e) => setFormData({...formData, status: e.target.value})}
               >
