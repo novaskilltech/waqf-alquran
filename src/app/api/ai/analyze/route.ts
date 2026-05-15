@@ -1,53 +1,66 @@
 import { NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY || "");
-
+/**
+ * Moteur d'analyse IA Universel (Optimisé pour Kilo AI Gateway)
+ */
 export async function POST(req: Request) {
   try {
     const { word, context, ayahNumber, surahNumber } = await req.json();
 
-    if (!process.env.GOOGLE_GEMINI_API_KEY) {
+    const apiKey = process.env.AI_PROVIDER_API_KEY;
+    const baseUrl = process.env.AI_BASE_URL || "https://api.kilo.ai/v1";
+    const modelName = process.env.AI_MODEL_NAME || "kilo-auto/free";
+
+    if (!apiKey) {
       return NextResponse.json({ 
         success: false, 
-        error: "Clé API Gemini manquante. Veuillez configurer GOOGLE_GEMINI_API_KEY." 
+        error: "Clé API manquante. Veuillez configurer AI_PROVIDER_API_KEY dans votre .env" 
       }, { status: 500 });
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const response = await fetch(`${baseUrl}/chat/completions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: modelName,
+        messages: [
+          {
+            role: "system",
+            content: "Tu es un expert en sciences du Coran et en grammaire arabe (Sarf/Nahw). Réponds uniquement au format JSON avec les clés: ruling, explanation, taalil."
+          },
+          {
+            role: "user",
+            content: `Analyse le mot "${word}" dans ce verset : "${context}" (Verset ${ayahNumber}, Sourate ${surahNumber}).`
+          }
+        ],
+        response_format: { type: "json_object" }
+      })
+    });
 
-    const prompt = `
-      Tu es un expert mondial en sciences du Coran (Ulum al-Quran) et en grammaire arabe (Sarf et Nahw).
-      Analyse le mot "${word}" dans le contexte du verset suivant : "${context}" (Verset ${ayahNumber}, Sourate ${surahNumber}).
-      
-      Ta mission est de fournir une analyse de Waqf (arrêt) sur ce mot précis.
-      
-      Réponds UNIQUEMENT au format JSON suivant :
-      {
-        "ruling": "Le jugement de Waqf (ex: وقف تام, وقف كاف, وقف جائز, etc.)",
-        "explanation": "Une explication simplifiée pour un étudiant (en arabe)",
-        "taalil": "Une justification technique/grammaire/théologique pour un spécialiste (en arabe)"
-      }
-    `;
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error?.message || "Erreur de la passerelle IA");
+    }
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
-    
-    // Nettoyage du texte au cas où le modèle ajouterait des balises markdown ```json
-    const cleanJson = text.replace(/```json/g, '').replace(/```/g, '').trim();
-    const analysis = JSON.parse(cleanJson);
+    const data = await response.json();
+    const analysis = JSON.parse(data.choices[0].message.content);
 
     return NextResponse.json({
       success: true,
       analysis: {
         ...analysis,
-        aiModel: "Gemini 2.0 Flash (NOVA-WAQF Engine)",
+        aiModel: `Kilo Gateway (${modelName})`,
         timestamp: new Date().toISOString()
       }
     });
-  } catch (error) {
-    console.error("AI Analysis Error:", error);
-    return NextResponse.json({ success: false, error: "خطأ في اتصال الذكاء الاصطناعي" }, { status: 500 });
+  } catch (error: any) {
+    console.error("AI Gateway Error:", error);
+    return NextResponse.json({ 
+      success: false, 
+      error: error.message || "خطأ في اتصال الذكاء الاصطناعي" 
+    }, { status: 500 });
   }
 }
