@@ -18,6 +18,10 @@ const rootsMap: Record<string, WordMorphology> = {
   "الرَّحِيمِ": { root: "رحm", lemma: "رَحِيم", grammar: "اسم" },
   "نَعْبُدُ": { root: "عبد", lemma: "عَبَدَ", grammar: "فعل مضارع" },
   "نَسْتَعِينُ": { root: "عون", lemma: "اِسْتَعَانَ", grammar: "فعل مضارع" },
+  "يُوقِنُونَ": { root: "يقن", lemma: "أَيْقَنَ", grammar: "فعل مضارع" },
+  "مَرَضٌ": { root: "مرض", lemma: "مَرَض", grammar: "اسم" },
+  "يَكْذِبُونَ": { root: "كذب", lemma: "كَذَبَ", grammar: "فعل مضارع" },
+  "أَلِيمٌ": { root: "ألم", lemma: "أَلِيم", grammar: "اسم" },
   "اهْدِنَا": { root: "هدي", lemma: "هَدَى", grammar: "فعل أمر" },
   "الصِّرَاطَ": { root: "سرط", lemma: "صِرَاط", grammar: "اسم" },
   "الَّذِينَ": { root: "لذي", lemma: "الَّذِي", grammar: "اسم موصول" },
@@ -35,12 +39,16 @@ const rootsMap: Record<string, WordMorphology> = {
 
 /**
  * Récupère la morphologie d'un mot coranique
- * Nettoie les caractères spéciaux avant la recherche
+ * Nettoie les caractères spéciaux et les signes de Waqf avant la recherche
  */
 export function getWordMorphology(word: string): WordMorphology | null {
-  // Nettoyage basique (suppression des voyelles pour la recherche si nécessaire)
-  // Pour l'instant on cherche le mot exact avec tashkeel
-  const cleanedWord = word.trim();
+  if (!word) return null;
+  
+  // Supprimer les signes de Waqf et ponctuation coranique (U+0610 à U+061A, U+06D6 à U+06ED)
+  const cleanedWord = word.trim()
+    .replace(/[\u0610-\u061A\u06D6-\u06ED]/g, '')
+    .replace(/[ۣۖۗۚۛۜ۟۠ۡۢۥۦۧۨ]/g, '');
+
   return rootsMap[cleanedWord] || null;
 }
 

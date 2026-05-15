@@ -87,9 +87,9 @@ export default function AyahViewer({ text, waqfPoints, mode }: AyahViewerProps) 
                   margin: '0 2px',
                   borderRadius: '6px',
                   backgroundColor: isSelected ? 'var(--accent-color)' : 'transparent',
-                  borderBottom: hasPoints && !isSelected
+                  borderBottom: hasPoints && !isSelected && word.length > 1
                     ? `2px solid ${getMethodColor(points[0].methodology)}` 
-                    : (isSpecialist && !hasPoints ? '1px dashed #eee' : 'none'),
+                    : (isSpecialist && !hasPoints && word.length > 1 ? '1px dashed #ccc' : 'none'),
                   transition: 'all 0.2s ease',
                   display: 'inline-block'
                 }}
