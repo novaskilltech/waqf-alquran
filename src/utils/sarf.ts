@@ -47,13 +47,12 @@ const rootsMap: Record<string, WordMorphology> = {
 export function getWordMorphology(word: string): WordMorphology | null {
   if (!word) return null;
   
-  // Fonction de normalisation radicale : ne garde que les lettres arabes de base
-  // Supprime voyelles (tashkeel), signes de waqf, et caractères spéciaux de décoration
   const ultraNormalize = (txt: string) => {
+    // 1. Ne garde QUE les lettres de base de l'alphabet arabe
+    // 2. Normalise les variantes d'Alif (أ، إ، آ، ٱ -> ا)
     return txt
-      .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u0610-\u061A]/g, '') // Voyelles et signes
-      .replace(/[ۣۖۗۚۛۜ۟۠ۡۢۥۦۧۨ]/g, '') // Signes de Waqf
-      .replace(/\s+/g, '') // Espaces
+      .replace(/[^\u0621-\u064A]/g, '')
+      .replace(/[أإآٱ]/g, 'ا')
       .trim();
   };
 
