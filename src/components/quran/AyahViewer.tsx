@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronRight, ChevronLeft, Info, Book, Library, Sparkles, Fingerprint } from 'lucide-react';
 import { getWordMorphology, getGrammarColor } from '@/utils/sarf';
 
