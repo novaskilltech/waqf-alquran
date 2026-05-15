@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
+import { ChevronRight, ChevronLeft, Info, Book, Library, Sparkles } from 'lucide-react';
 
 interface WaqfData {
   wordIndex: number;
