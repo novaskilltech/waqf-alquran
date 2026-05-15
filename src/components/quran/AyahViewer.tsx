@@ -26,8 +26,8 @@ export default function AyahViewer({ text, waqfPoints, mode }: AyahViewerProps) 
   const [aiAnalysis, setAiAnalysis] = useState<any>(null);
   const [isAiLoading, setIsAiLoading] = useState(false);
   
-  // Split text into words
-  const words = text.split(' ');
+  // Split text into words (cleanly)
+  const words = text.split(/\s+/).filter(w => w.trim());
 
   // Get all waqf points for the selected word
   const currentPoints = selectedWordIdx !== null 
