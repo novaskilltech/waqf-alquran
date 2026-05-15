@@ -10,6 +10,7 @@
     "import-quran": "node prisma/import-quran.js"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@prisma/client": "^5.10.0",
     "@supabase/supabase-js": "^2.105.4",
     "lucide-react": "latest",

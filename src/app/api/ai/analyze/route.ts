@@ -1,40 +1,53 @@
 import { NextResponse } from 'next/server';
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY || "");
 
 export async function POST(req: Request) {
   try {
     const { word, context, ayahNumber, surahNumber } = await req.json();
 
-    // Simulation d'une analyse scientifique poussée (Moteur NOVA-WAQF)
-    // Dans une version future, on pourra connecter ici l'API Gemini ou OpenAI
-    
-    const analyses = [
+    if (!process.env.GOOGLE_GEMINI_API_KEY) {
+      return NextResponse.json({ 
+        success: false, 
+        error: "Clé API Gemini manquante. Veuillez configurer GOOGLE_GEMINI_API_KEY." 
+      }, { status: 500 });
+    }
+
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+
+    const prompt = `
+      Tu es un expert mondial en sciences du Coran (Ulum al-Quran) et en grammaire arabe (Sarf et Nahw).
+      Analyse le mot "${word}" dans le contexte du verset suivant : "${context}" (Verset ${ayahNumber}, Sourate ${surahNumber}).
+      
+      Ta mission est de fournir une analyse de Waqf (arrêt) sur ce mot précis.
+      
+      Réponds UNIQUEMENT au format JSON suivant :
       {
-        ruling: "وقف جائز (ج)",
-        explanation: `الوقف على كلمة "${word}" جائز لتمام المعنى في هذا الموضع، والابتداء بما بعدها مستقيم لا يغير المفهوم العقدي أو اللغوي.`,
-        taalil: "من الناحية النحوية، انتهت الجملة الفعلية هنا، وما بعدها يبدأ جملة استئنافية جديدة تعزز المعنى السابق."
-      },
-      {
-        ruling: "وقف كاف",
-        explanation: `هذا الموضع يعتبر وقفاً كافياً لأن المعنى قد تم، ولكن هناك تعلق لفظي بسيط بما بعده من حيث السياق القصصي.`,
-        taalil: "السياق هنا يتحدث عن أحكام، والوقف يساعد القارئ على استيعاب الحكم قبل الانتقال لتفصيله."
+        "ruling": "Le jugement de Waqf (ex: وقف تام, وقف كاف, وقف جائز, etc.)",
+        "explanation": "Une explication simplifiée pour un étudiant (en arabe)",
+        "taalil": "Une justification technique/grammaire/théologique pour un spécialiste (en arabe)"
       }
-    ];
+    `;
 
-    // On choisit une analyse de manière déterministe pour l'exemple
-    const result = analyses[word.length % 2];
-
-    // Simuler un temps de réflexion de l'IA
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    
+    // Nettoyage du texte au cas où le modèle ajouterait des balises markdown ```json
+    const cleanJson = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    const analysis = JSON.parse(cleanJson);
 
     return NextResponse.json({
       success: true,
       analysis: {
-        ...result,
-        aiModel: "NOVA-WAQF v1.0",
+        ...analysis,
+        aiModel: "Gemini 2.0 Flash (NOVA-WAQF Engine)",
         timestamp: new Date().toISOString()
       }
     });
   } catch (error) {
-    return NextResponse.json({ success: false, error: "خطأ في تحليل الذكاء الاصطnaعي" }, { status: 500 });
+    console.error("AI Analysis Error:", error);
+    return NextResponse.json({ success: false, error: "خطأ في اتصال الذكاء الاصطناعي" }, { status: 500 });
   }
 }
