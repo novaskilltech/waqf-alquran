@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Save, Plus, Trash2, Eye, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Save, Plus, Trash2, Eye, ChevronRight, ChevronLeft, Library, Book } from 'lucide-react';
 
 export default function WaqfEditor() {
   const [surahList, setSurahList] = useState<any[]>([]);
