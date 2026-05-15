@@ -23,6 +23,8 @@ interface AyahViewerProps {
 
 export default function AyahViewer({ text, waqfPoints, mode }: AyahViewerProps) {
   const [selectedWordIdx, setSelectedWordIdx] = useState<number | null>(null);
+  const [aiAnalysis, setAiAnalysis] = useState<any>(null);
+  const [isAiLoading, setIsAiLoading] = useState(false);
   
   // Split text into words
   const words = text.split(' ');
@@ -36,6 +38,31 @@ export default function AyahViewer({ text, waqfPoints, mode }: AyahViewerProps) 
   useEffect(() => {
     setAiAnalysis(null);
   }, [selectedWordIdx]);
+
+  const handleAiAnalyze = async (word: string) => {
+    setIsAiLoading(true);
+    try {
+      const response = await fetch('/api/ai/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ word, context: text })
+      });
+      const data = await response.json();
+      setAiAnalysis(data);
+    } catch (error) {
+      console.error('AI Analysis failed:', error);
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
+  const getMethodColor = (methodology?: string) => {
+    switch (methodology) {
+      case 'MADINA': return '#059669';
+      case 'HABTI': return '#2563eb';
+      default: return '#6366f1';
+    }
+  };
 
   return (
     <div className="card" style={{ position: 'relative' }}>
