@@ -12,7 +12,8 @@ export interface WordMorphology {
 // Dictionnaire de démonstration (à enrichir via API ou import JSON)
 const rootsMap: Record<string, WordMorphology> = {
   "يَعْمَلُونَ": { root: "عمل", lemma: "عَمِلَ", grammar: "فعل مضارع" },
-  "تَعْمَلُونَ": { root: "عمل", lemma: "عَمِلَ", grammar: "فعل مضارع" },
+  "عَمِلُوا": { root: "عمل", lemma: "عَمِلَ", grammar: "فعل ماض" },
+  "آمَنُوا": { root: "أمن", lemma: "آمَنَ", grammar: "فعل ماض" },
   "فِي": { root: "في", lemma: "فِي", grammar: "حرف جر" },
   "قُلُوبِهِم": { root: "قلب", lemma: "قَلْب", grammar: "اسم" },
   "مَرَضٌ": { root: "مرض", lemma: "مَرَض", grammar: "اسم" },
@@ -41,24 +42,53 @@ const rootsMap: Record<string, WordMorphology> = {
 
 /**
  * Récupère la morphologie d'un mot coranique
- * Nettoie les caractères spéciaux et les signes de Waqf avant la recherche
+ * Nettoie absolument tout sauf les lettres de base pour la recherche
  */
 export function getWordMorphology(word: string): WordMorphology | null {
   if (!word) return null;
   
-  // Supprimer les signes de Waqf et ponctuation coranique (U+0610 à U+061A, U+06D6 à U+06ED)
-  const cleanedWord = word.trim()
-    .replace(/[\u0610-\u061A\u06D6-\u06ED]/g, '')
-    .replace(/[ۣۖۗۚۛۜ۟۠ۡۢۥۦۧۨ]/g, '');
+  // Fonction de normalisation radicale : ne garde que les lettres arabes de base
+  // Supprime voyelles (tashkeel), signes de waqf, et caractères spéciaux de décoration
+  const ultraNormalize = (txt: string) => {
+    return txt
+      .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u0610-\u061A]/g, '') // Voyelles et signes
+      .replace(/[ۣۖۗۚۛۜ۟۠ۡۢۥۦۧۨ]/g, '') // Signes de Waqf
+      .replace(/\s+/g, '') // Espaces
+      .trim();
+  };
 
-  return rootsMap[cleanedWord] || null;
+  const searchTarget = ultraNormalize(word);
+
+  // 1. Essayer de trouver une correspondance dans le dictionnaire normalisé
+  for (const [key, value] of Object.entries(rootsMap)) {
+    if (ultraNormalize(key) === searchTarget) return value;
+  }
+
+  // 2. Gestion des préfixes (و، ف، ب، ل) sur le mot normalisé
+  const prefixes = ['و', 'ف', 'ب', 'ل'];
+  for (const pref of prefixes) {
+    if (searchTarget.startsWith(pref) && searchTarget.length > 3) {
+      const stripped = searchTarget.substring(1);
+      for (const [key, value] of Object.entries(rootsMap)) {
+        if (ultraNormalize(key) === stripped) return value;
+      }
+    }
+  }
+
+  // 3. Fallback spécial pour les racines communes si toujours rien
+  if (searchTarget.includes('عمل')) return rootsMap["عَمِلُوا"];
+  if (searchTarget.includes('امن')) return rootsMap["آمَنُوا"];
+
+  return null;
 }
 
 /**
  * Retourne la couleur associée à une catégorie grammaticale
  */
 export function getGrammarColor(grammar: string): string {
-  if (grammar.includes("فعل")) return "#e53e3e"; // Rouge pour les verbes
-  if (grammar.includes("اسم")) return "#3182ce"; // Bleu pour les noms
-  return "#718096"; // Gris pour le reste
+  const g = grammar.toLowerCase();
+  if (g.includes("فعل")) return "#ef4444"; // Rouge moderne
+  if (g.includes("اسم")) return "#3b82f6"; // Bleu moderne
+  if (g.includes("حرف")) return "#10b981"; // Vert moderne
+  return "#64748b"; // Slate pour le reste
 }
