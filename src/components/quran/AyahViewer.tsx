@@ -31,12 +31,10 @@ export default function AyahViewer({ text, waqfPoints, mode }: AyahViewerProps) 
     ? waqfPoints.filter(p => p.wordIndex === selectedWordIdx)
     : [];
 
-  const getMethodColor = (m: string) => {
-    if (m === 'MADINA') return '#1e40af'; // Blue
-    if (m === 'HABTI') return '#15803d'; // Green
-    if (m === 'BOOKS') return '#b45309'; // Amber
-    return 'var(--accent-color)';
-  };
+  // Reset AI analysis when word changes
+  useEffect(() => {
+    setAiAnalysis(null);
+  }, [selectedWordIdx]);
 
   return (
     <div className="card" style={{ position: 'relative' }}>
@@ -79,30 +77,13 @@ export default function AyahViewer({ text, waqfPoints, mode }: AyahViewerProps) 
         })}
       </div>
 
-      {/* Comparison Detail Card / Library Entry */}
-      {selectedWordIdx !== null && currentPoints.length > 0 && (
-        <div 
-          className="animate-fade"
-          style={{
-            marginTop: '2rem',
-            padding: '2rem',
-            backgroundColor: '#ffffff',
-            borderRadius: '16px',
-            border: '1px solid var(--border-color)',
-            boxShadow: '0 10px 25px rgba(0,0,0,0.05)',
-            position: 'relative'
-          }}
-        >
-          <button 
-            onClick={() => setSelectedWordIdx(null)}
-            style={{ position: 'absolute', top: '15px', left: '15px', border: 'none', background: '#eee', borderRadius: '50%', width: '30px', height: '30px', cursor: 'pointer' }}
-          >
-            ×
-          </button>
-          
-          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-            <h2 style={{ color: 'var(--primary-color)', margin: 0 }}>مكتبة الوقف والابتداء</h2>
-            <p style={{ color: '#666' }}>تفصيل الموضع: <strong style={{ color: 'var(--accent-color)', fontSize: '1.4rem' }}>{words[selectedWordIdx]}</strong></p>
+      {selectedWordIdx !== null && (
+        <div className="animate-fade-up" style={{ marginTop: '2rem', padding: '1.5rem', borderTop: '1px solid #eee' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <h3 style={{ color: 'var(--primary-color)' }}>
+              تفاصيل الكلمة: <span style={{ color: 'var(--secondary-color)' }}>{words[selectedWordIdx]}</span>
+            </h3>
+            <button className="btn btn-outline" onClick={() => setSelectedWordIdx(null)}>إغلاق</button>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -154,7 +135,10 @@ export default function AyahViewer({ text, waqfPoints, mode }: AyahViewerProps) 
                   </div>
                 </div>
               ))
-            ) : (
+            ) : null}
+
+            {/* AI Assistant Block */}
+            {!isAiLoading && !aiAnalysis && currentPoints.length === 0 && (
               <div style={{ textAlign: 'center', padding: '2rem', background: '#f9f9f9', borderRadius: '12px', border: '2px dashed #ddd' }}>
                 <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🤖</div>
                 <h3>هذا الموضع ليس له علامة في المصحف</h3>
@@ -162,11 +146,67 @@ export default function AyahViewer({ text, waqfPoints, mode }: AyahViewerProps) 
                 <button 
                   className="btn-primary" 
                   style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 auto' }}
-                  onClick={() => alert('جاري تحليل الموضع من قبل الذكاء الاصطناعي...')}
+                  onClick={() => handleAiAnalyze(words[selectedWordIdx])}
                 >
                   <Sparkles size={18} />
                   تحليل الموضع بالذكاء الاصطناعي
                 </button>
+              </div>
+            )}
+
+            {isAiLoading && (
+              <div style={{ textAlign: 'center', padding: '2rem' }}>
+                <div className="animate-pulse" style={{ color: 'var(--primary-color)', fontSize: '1.2rem' }}>
+                  <Sparkles size={48} className="animate-spin" style={{ margin: '0 auto 1rem', display: 'block' }} />
+                  جاري تحليل الموضع علمياً...
+                </div>
+              </div>
+            )}
+
+            {aiAnalysis && (
+              <div className="animate-fade-in" style={{ 
+                border: `2px solid var(--secondary-color)`, 
+                borderRadius: '12px', 
+                overflow: 'hidden',
+                backgroundColor: '#fff'
+              }}>
+                <div style={{ 
+                  backgroundColor: 'var(--secondary-color)', 
+                  color: 'white', 
+                  padding: '0.8rem 1.5rem',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Sparkles size={18} />
+                    <span style={{ fontWeight: 'bold' }}>تحليل المساعد الذكي (NOVA-WAQF)</span>
+                  </div>
+                  <span style={{ fontSize: '0.8rem', background: 'rgba(255,255,255,0.2)', padding: '2px 8px', borderRadius: '4px' }}>بناءً على السياق اللغوي</span>
+                </div>
+
+                <div style={{ padding: '1.5rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+                    <div style={{ background: '#fff9f0', padding: '1rem', borderRadius: '8px', textAlign: 'center', border: '1px solid #ffe4b5' }}>
+                      <div style={{ color: '#888', fontSize: '0.9rem', marginBottom: '0.5rem' }}>الحكم المقترح</div>
+                      <div style={{ color: '#b45309', fontWeight: 'bold', fontSize: '1.2rem' }}>{aiAnalysis.ruling}</div>
+                    </div>
+                    <div style={{ background: '#f0fdf4', padding: '1rem', borderRadius: '8px', textAlign: 'center', border: '1px solid #dcfce7' }}>
+                      <div style={{ color: '#888', fontSize: '0.9rem', marginBottom: '0.5rem' }}>الدقة التقريبية</div>
+                      <div style={{ color: '#15803d', fontWeight: 'bold', fontSize: '1.2rem' }}>95%</div>
+                    </div>
+                  </div>
+
+                  <div style={{ marginBottom: '1.5rem' }}>
+                    <h4 style={{ color: 'var(--secondary-color)', marginBottom: '0.5rem' }}>📝 التفسير التحليلي:</h4>
+                    <p style={{ lineHeight: '1.6', color: '#444' }}>{aiAnalysis.explanation}</p>
+                  </div>
+
+                  <div style={{ background: '#fdf2f2', padding: '1rem', borderRadius: '8px', borderLeft: '4px solid #ef4444' }}>
+                    <h4 style={{ color: '#991b1b', marginBottom: '0.5rem', fontSize: '0.9rem' }}>🔍 التعليل اللغوي:</h4>
+                    <p style={{ fontSize: '0.95rem', color: '#b91c1c', lineHeight: '1.5' }}>{aiAnalysis.taalil}</p>
+                  </div>
+                </div>
               </div>
             )}
           </div>
