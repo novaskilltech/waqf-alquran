@@ -176,16 +176,25 @@ export default function WaqfEditor() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '2rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '380px 1fr', gap: '2rem' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          <div className="card">
-            <h3 style={{ marginBottom: '1rem' }}>اختيار الموضع</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div className="card" style={{ padding: '1.5rem' }}>
+            <h3 style={{ marginBottom: '1.2rem', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Library size={18} /> اختيار الموضع
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>السورة</label>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: '#64748b' }}>السورة</label>
                 <select 
-                  className="btn btn-outline" 
-                  style={{ width: '100%', textAlign: 'right' }}
+                  style={{ 
+                    width: '100%', 
+                    padding: '0.75rem', 
+                    borderRadius: '8px', 
+                    border: '1px solid #e2e8f0',
+                    backgroundColor: '#f8fafc',
+                    fontSize: '1rem',
+                    textAlign: 'right'
+                  }}
                   value={selectedSurah}
                   onChange={(e) => setSelectedSurah(e.target.value)}
                 >
@@ -196,9 +205,10 @@ export default function WaqfEditor() {
                   ))}
                 </select>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f1f5f9', padding: '0.5rem', borderRadius: '10px' }}>
                 <button 
                   className="btn btn-outline" 
+                  style={{ background: 'white', padding: '0.5rem' }}
                   onClick={() => {
                     setCurrentAyahIdx(prev => Math.max(0, prev - 1));
                     setSelectedWordIdx(null);
@@ -208,10 +218,11 @@ export default function WaqfEditor() {
                   <ChevronRight size={18} />
                 </button>
                 <div style={{ textAlign: 'center' }}>
-                  <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>آية {currentAyah?.number || 0}</span>
+                  <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'var(--primary-color)' }}>آية {currentAyah?.number || 0}</span>
                 </div>
                 <button 
                   className="btn btn-outline" 
+                  style={{ background: 'white', padding: '0.5rem' }}
                   onClick={() => {
                     setCurrentAyahIdx(prev => Math.min(ayahs.length - 1, prev + 1));
                     setSelectedWordIdx(null);
@@ -224,10 +235,20 @@ export default function WaqfEditor() {
             </div>
           </div>
 
-          <div className="card">
-            <h3 style={{ marginBottom: '1rem' }}>نص الآية</h3>
-            <div className="quran-text" style={{ fontSize: '1.5rem', padding: '1rem', lineHeight: '2.5', textAlign: 'center' }}>
-              {currentAyah?.text.split(' ').map((word: string, idx: number) => {
+          <div className="card" style={{ padding: '1.5rem' }}>
+            <h3 style={{ marginBottom: '1.2rem', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Book size={18} /> نص الآية
+            </h3>
+            <div className="quran-text" style={{ 
+              fontSize: '1.8rem', 
+              padding: '1rem', 
+              lineHeight: '3', 
+              textAlign: 'center',
+              backgroundColor: '#fffcf5',
+              borderRadius: '12px',
+              border: '1px border #fef3c7'
+            }}>
+              {currentAyah?.text.split(/\s+/).filter(w => w.trim()).map((word: string, idx: number) => {
                 const isSelected = selectedWordIdx === idx;
                 const hasExisting = waqfPoints.some((p: any) => p.wordIndex === idx);
                 
@@ -237,12 +258,14 @@ export default function WaqfEditor() {
                     onClick={() => setSelectedWordIdx(idx)}
                     style={{ 
                       cursor: 'pointer',
-                      padding: '0 5px',
-                      margin: '0 2px',
-                      borderRadius: '4px',
+                      padding: '0 8px',
+                      margin: '2px',
+                      borderRadius: '8px',
                       backgroundColor: isSelected ? 'var(--accent-color)' : 'transparent',
-                      borderBottom: hasExisting ? '2px solid var(--primary-color)' : 'none',
-                      transition: 'all 0.2s'
+                      borderBottom: hasExisting && !isSelected ? '3px solid var(--primary-color)' : 'none',
+                      boxShadow: isSelected ? '0 4px 12px rgba(0,0,0,0.1)' : 'none',
+                      transition: 'all 0.2s',
+                      display: 'inline-block'
                     }}
                   >
                     {word}
@@ -254,37 +277,44 @@ export default function WaqfEditor() {
         </div>
 
         {/* Column 2: Data Entry Form */}
-        <div className="card">
-          <h3 style={{ marginBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
-            {selectedWordIdx !== null ? `تعديل الموضع (كلمة: ${currentAyah?.text.split(' ')[selectedWordIdx]})` : 'اختر كلمة من الآية للبدء'}
-          </h3>
+        <div className="card" style={{ padding: '2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem', borderBottom: '2px solid #f1f5f9', paddingBottom: '1rem' }}>
+            <div style={{ background: 'var(--primary-color)', color: 'white', padding: '0.6rem', borderRadius: '10px' }}>
+              <Plus size={24} />
+            </div>
+            <div>
+              <h2 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>
+                {selectedWordIdx !== null ? `تعديل الموضع: ${currentAyah?.text.split(/\s+/).filter(w => w.trim())[selectedWordIdx]}` : 'تفاصيل الموضع'}
+              </h2>
+              <p style={{ fontSize: '0.85rem', color: '#64748b' }}>أدخل البيانات العلمية الدقيقة للموضع المختار</p>
+            </div>
+          </div>
           
           <div style={{ 
             display: 'grid', 
             gridTemplateColumns: '1fr 1fr', 
             gap: '1.5rem', 
-            opacity: selectedWordIdx === null ? 0.5 : 1, 
-            pointerEvents: selectedWordIdx === null ? 'none' : 'auto' 
+            opacity: selectedWordIdx === null ? 0.4 : 1, 
+            pointerEvents: selectedWordIdx === null ? 'none' : 'auto',
+            transition: 'opacity 0.3s'
           }}>
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem' }}>المنهج</label>
+            <div className="form-group">
+              <label style={{ display: 'block', marginBottom: '0.6rem', fontWeight: '500' }}>المنهج العلمي</label>
               <select 
-                className="btn btn-outline" 
-                style={{ width: '100%', textAlign: 'right' }}
+                style={inputStyle}
                 value={formData.methodology}
                 onChange={(e) => setFormData({...formData, methodology: e.target.value})}
               >
-                <option value="MADINA">مصحف المدينة</option>
-                <option value="HABTI">وقف الهبطي</option>
-                <option value="BOOKS">كتب الوقف</option>
+                <option value="MADINA">مصحf المدينة المنورة</option>
+                <option value="HABTI">منهج الإمام الهبطي</option>
+                <option value="BOOKS">أمهات كتب الوقف</option>
               </select>
             </div>
 
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem' }}>حكم الوقف</label>
+            <div className="form-group">
+              <label style={{ display: 'block', marginBottom: '0.6rem', fontWeight: '500' }}>حكم الوقف</label>
               <select 
-                className="btn btn-outline" 
-                style={{ width: '100%', textAlign: 'right' }}
+                style={inputStyle}
                 value={formData.ruling}
                 onChange={(e) => setFormData({...formData, ruling: e.target.value})}
               >
@@ -296,11 +326,10 @@ export default function WaqfEditor() {
               </select>
             </div>
 
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem' }}>حكم الابتداء</label>
+            <div className="form-group">
+              <label style={{ display: 'block', marginBottom: '0.6rem', fontWeight: '500' }}>حكم الابتداء</label>
               <select 
-                className="btn btn-outline" 
-                style={{ width: '100%', textAlign: 'right' }}
+                style={inputStyle}
                 value={formData.hukumIbtida}
                 onChange={(e) => setFormData({...formData, hukumIbtida: e.target.value})}
               >
@@ -311,50 +340,46 @@ export default function WaqfEditor() {
               </select>
             </div>
 
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem' }}>المصدر العلمي</label>
+            <div className="form-group">
+              <label style={{ display: 'block', marginBottom: '0.6rem', fontWeight: '500' }}>المصدر العلمي</label>
               <input 
                 type="text" 
-                className="btn btn-outline" 
-                style={{ width: '100%', textAlign: 'right' }} 
-                placeholder="مثال: منار الهدى"
+                style={inputStyle} 
+                placeholder="مثال: منار الهدى للأشموني"
                 value={formData.source}
                 onChange={(e) => setFormData({...formData, source: e.target.value})}
               />
             </div>
 
             <div style={{ gridColumn: 'span 2' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem' }}>الشرح المبسط (للطالب)</label>
+              <label style={{ display: 'block', marginBottom: '0.6rem', fontWeight: '500' }}>الشرح المبسط (للطالب)</label>
               <textarea 
-                className="btn btn-outline"
-                style={{ width: '100%', minHeight: '80px', padding: '1rem', textAlign: 'right', height: 'auto' }}
-                placeholder="اشرح سبب الوقف هنا للطلاب..."
+                style={{ ...inputStyle, minHeight: '100px', resize: 'vertical' }}
+                placeholder="قدم شرحاً يسهل على الطالب فهم سبب الوقف..."
                 value={formData.explanation}
                 onChange={(e) => setFormData({...formData, explanation: e.target.value})}
               ></textarea>
             </div>
 
             <div style={{ gridColumn: 'span 2' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem' }}>التعليل العلمي (للمتخصص)</label>
+              <label style={{ display: 'block', marginBottom: '0.6rem', fontWeight: '500' }}>التعليل العلمي (للمتخصص)</label>
               <textarea 
-                className="btn btn-outline"
-                style={{ width: '100%', minHeight: '80px', padding: '1rem', textAlign: 'right', height: 'auto' }}
-                placeholder="التفصيل العلمي والأوجه النحوية..."
+                style={{ ...inputStyle, minHeight: '100px', resize: 'vertical' }}
+                placeholder="التفصيل النحوي واللغوي الدقيق..."
                 value={formData.taalil}
                 onChange={(e) => setFormData({...formData, taalil: e.target.value})}
               ></textarea>
             </div>
 
             <div style={{ gridColumn: 'span 2' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem' }}>حالة المراجعة</label>
+              <label style={{ display: 'block', marginBottom: '0.6rem', fontWeight: '500' }}>حالة المراجعة</label>
               <select 
-                className="btn btn-outline" 
-                style={{ width: '100%', textAlign: 'right' }}
+                style={inputStyle}
                 value={formData.status}
                 onChange={(e) => setFormData({...formData, status: e.target.value})}
               >
-                <option value="DRAFT">مسودة (Draft)</option>
-                <option value="APPROVED">معتمد (Approved)</option>
+                <option value="DRAFT">📌 مسودة - قيد العمل</option>
+                <option value="APPROVED">✅ معتمد - للنشر</option>
               </select>
             </div>
           </div>
@@ -363,3 +388,15 @@ export default function WaqfEditor() {
     </div>
   );
 }
+
+const inputStyle: React.CSSProperties = {
+  width: '100%', 
+  padding: '0.8rem 1rem', 
+  borderRadius: '10px', 
+  border: '1px solid #e2e8f0',
+  backgroundColor: '#fff',
+  fontSize: '1rem',
+  textAlign: 'right',
+  outline: 'none',
+  transition: 'border-color 0.2s',
+};
