@@ -6,7 +6,7 @@ interface WaqfData {
   wordIndex: number;
   ruling: string;
   explanation: string;
-  methodology: string; // Added property
+  methodology?: string; // Made optional to fix Search page error
   hukumIbtida?: string;
   taalil?: string;
   type?: string;
