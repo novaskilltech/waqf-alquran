@@ -48,7 +48,9 @@ export default function AyahViewer({ text, waqfPoints, mode }: AyahViewerProps) 
         body: JSON.stringify({ word, context: text })
       });
       const data = await response.json();
-      setAiAnalysis(data);
+      if (data.success) {
+        setAiAnalysis(data.analysis);
+      }
     } catch (error) {
       console.error('AI Analysis failed:', error);
     } finally {
