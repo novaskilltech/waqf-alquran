@@ -11,6 +11,7 @@ export interface WordMorphology {
 
 // Dictionnaire de démonstration (à enrichir via API ou import JSON)
 const rootsMap: Record<string, WordMorphology> = {
+  "نِعْمَ": { root: "نعم", lemma: "نِعْمَ", grammar: "فعل جامد" },
   "يَعْمَلُونَ": { root: "عمل", lemma: "عَمِلَ", grammar: "فعل مضارع" },
   "عَمِلُوا": { root: "عمل", lemma: "عَمِلَ", grammar: "فعل ماض" },
   "آمَنُوا": { root: "أمن", lemma: "آمَنَ", grammar: "فعل ماض" },
