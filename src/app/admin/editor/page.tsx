@@ -241,16 +241,18 @@ export default function WaqfEditor() {
             </h3>
             <div className="quran-text" style={{ 
               fontSize: '1.8rem', 
-              padding: '1rem', 
+              padding: '1.5rem', 
               lineHeight: '3', 
               textAlign: 'center',
               backgroundColor: '#fffcf5',
-              borderRadius: '12px',
-              border: '1px border #fef3c7'
+              borderRadius: '16px',
+              border: '1px solid #fef3c7',
+              boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)'
             }}>
               {currentAyah?.text.split(/\s+/).filter(w => w.trim()).map((word: string, idx: number) => {
                 const isSelected = selectedWordIdx === idx;
                 const hasExisting = waqfPoints.some((p: any) => p.wordIndex === idx);
+                const isActualWord = /[\u0600-\u06FF]/.test(word) && word.length > 1;
                 
                 return (
                   <span 
@@ -258,14 +260,16 @@ export default function WaqfEditor() {
                     onClick={() => setSelectedWordIdx(idx)}
                     style={{ 
                       cursor: 'pointer',
-                      padding: '0 8px',
-                      margin: '2px',
-                      borderRadius: '8px',
+                      padding: '0 10px',
+                      margin: '4px',
+                      borderRadius: '10px',
                       backgroundColor: isSelected ? 'var(--accent-color)' : 'transparent',
-                      borderBottom: hasExisting && !isSelected ? '3px solid var(--primary-color)' : 'none',
-                      boxShadow: isSelected ? '0 4px 12px rgba(0,0,0,0.1)' : 'none',
-                      transition: 'all 0.2s',
-                      display: 'inline-block'
+                      borderBottom: (hasExisting && !isSelected && isActualWord) ? '4px solid var(--primary-color)' : 'none',
+                      boxShadow: isSelected ? '0 6px 15px rgba(0,0,0,0.1)' : 'none',
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      display: 'inline-block',
+                      color: isSelected ? 'var(--primary-color)' : 'inherit',
+                      fontWeight: isSelected ? 'bold' : 'normal'
                     }}
                   >
                     {word}
@@ -277,42 +281,42 @@ export default function WaqfEditor() {
         </div>
 
         {/* Column 2: Data Entry Form */}
-        <div className="card" style={{ padding: '2rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem', borderBottom: '2px solid #f1f5f9', paddingBottom: '1rem' }}>
-            <div style={{ background: 'var(--primary-color)', color: 'white', padding: '0.6rem', borderRadius: '10px' }}>
+        <div className="card" style={{ padding: '2.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2.5rem', borderBottom: '2px solid #f1f5f9', paddingBottom: '1.5rem' }}>
+            <div style={{ background: 'var(--primary-color)', color: 'white', padding: '0.8rem', borderRadius: '12px' }}>
               <Plus size={24} />
             </div>
             <div>
-              <h2 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>
-                {selectedWordIdx !== null ? `تعديل الموضع: ${currentAyah?.text.split(/\s+/).filter(w => w.trim())[selectedWordIdx]}` : 'تفاصيل الموضع'}
+              <h2 style={{ fontSize: '1.4rem', marginBottom: '0.3rem' }}>
+                {selectedWordIdx !== null ? `تعديل الموضع: ${currentAyah?.text.split(/\s+/).filter(w => w.trim())[selectedWordIdx]}` : 'تفاصيل الموضع العلمي'}
               </h2>
-              <p style={{ fontSize: '0.85rem', color: '#64748b' }}>أدخل البيانات العلمية الدقيقة للموضع المختار</p>
+              <p style={{ fontSize: '0.9rem', color: '#64748b' }}>أدخل البيانات والتعليلات العلمية الدقيقة للموضع</p>
             </div>
           </div>
           
           <div style={{ 
             display: 'grid', 
             gridTemplateColumns: '1fr 1fr', 
-            gap: '1.5rem', 
+            gap: '2rem', 
             opacity: selectedWordIdx === null ? 0.4 : 1, 
             pointerEvents: selectedWordIdx === null ? 'none' : 'auto',
             transition: 'opacity 0.3s'
           }}>
             <div className="form-group">
-              <label style={{ display: 'block', marginBottom: '0.6rem', fontWeight: '500' }}>المنهج العلمي</label>
+              <label style={{ display: 'block', marginBottom: '0.8rem', fontWeight: '600', color: '#334155' }}>المنهج العلمي</label>
               <select 
                 style={inputStyle}
                 value={formData.methodology}
                 onChange={(e) => setFormData({...formData, methodology: e.target.value})}
               >
-                <option value="MADINA">مصحf المدينة المنورة</option>
+                <option value="MADINA">مصحف المدينة المنورة</option>
                 <option value="HABTI">منهج الإمام الهبطي</option>
                 <option value="BOOKS">أمهات كتب الوقف</option>
               </select>
             </div>
 
             <div className="form-group">
-              <label style={{ display: 'block', marginBottom: '0.6rem', fontWeight: '500' }}>حكم الوقف</label>
+              <label style={{ display: 'block', marginBottom: '0.8rem', fontWeight: '600', color: '#334155' }}>حكم الوقف</label>
               <select 
                 style={inputStyle}
                 value={formData.ruling}
@@ -327,7 +331,7 @@ export default function WaqfEditor() {
             </div>
 
             <div className="form-group">
-              <label style={{ display: 'block', marginBottom: '0.6rem', fontWeight: '500' }}>حكم الابتداء</label>
+              <label style={{ display: 'block', marginBottom: '0.8rem', fontWeight: '600', color: '#334155' }}>حكم الابتداء</label>
               <select 
                 style={inputStyle}
                 value={formData.hukumIbtida}
@@ -341,7 +345,7 @@ export default function WaqfEditor() {
             </div>
 
             <div className="form-group">
-              <label style={{ display: 'block', marginBottom: '0.6rem', fontWeight: '500' }}>المصدر العلمي</label>
+              <label style={{ display: 'block', marginBottom: '0.8rem', fontWeight: '600', color: '#334155' }}>المصدر العلمي</label>
               <input 
                 type="text" 
                 style={inputStyle} 
@@ -352,9 +356,9 @@ export default function WaqfEditor() {
             </div>
 
             <div style={{ gridColumn: 'span 2' }}>
-              <label style={{ display: 'block', marginBottom: '0.6rem', fontWeight: '500' }}>الشرح المبسط (للطالب)</label>
+              <label style={{ display: 'block', marginBottom: '0.8rem', fontWeight: '600', color: '#334155' }}>الشرح المبسط (للطالب)</label>
               <textarea 
-                style={{ ...inputStyle, minHeight: '100px', resize: 'vertical' }}
+                style={{ ...inputStyle, minHeight: '140px', resize: 'vertical', lineHeight: '1.6' }}
                 placeholder="قدم شرحاً يسهل على الطالب فهم سبب الوقف..."
                 value={formData.explanation}
                 onChange={(e) => setFormData({...formData, explanation: e.target.value})}
@@ -362,17 +366,17 @@ export default function WaqfEditor() {
             </div>
 
             <div style={{ gridColumn: 'span 2' }}>
-              <label style={{ display: 'block', marginBottom: '0.6rem', fontWeight: '500' }}>التعليل العلمي (للمتخصص)</label>
+              <label style={{ display: 'block', marginBottom: '0.8rem', fontWeight: '600', color: '#334155' }}>التعليل العلمي (للمتخصص)</label>
               <textarea 
-                style={{ ...inputStyle, minHeight: '100px', resize: 'vertical' }}
-                placeholder="التفصيل النحوي واللغوي الدقيق..."
+                style={{ ...inputStyle, minHeight: '180px', resize: 'vertical', lineHeight: '1.6' }}
+                placeholder="التفصيل النحوي واللغوي الدقيق والأوجه العلمية..."
                 value={formData.taalil}
                 onChange={(e) => setFormData({...formData, taalil: e.target.value})}
               ></textarea>
             </div>
 
             <div style={{ gridColumn: 'span 2' }}>
-              <label style={{ display: 'block', marginBottom: '0.6rem', fontWeight: '500' }}>حالة المراجعة</label>
+              <label style={{ display: 'block', marginBottom: '0.8rem', fontWeight: '600', color: '#334155' }}>حالة المراجعة</label>
               <select 
                 style={inputStyle}
                 value={formData.status}
@@ -391,12 +395,13 @@ export default function WaqfEditor() {
 
 const inputStyle: React.CSSProperties = {
   width: '100%', 
-  padding: '0.8rem 1rem', 
-  borderRadius: '10px', 
-  border: '1px solid #e2e8f0',
+  padding: '1rem', 
+  borderRadius: '12px', 
+  border: '2px solid #f1f5f9',
   backgroundColor: '#fff',
   fontSize: '1rem',
   textAlign: 'right',
   outline: 'none',
-  transition: 'border-color 0.2s',
+  transition: 'all 0.2s ease',
+  boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
 };
