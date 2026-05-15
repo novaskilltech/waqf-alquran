@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from 'react';
-import { ChevronRight, ChevronLeft, Info, Book, Library, Sparkles } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Info, Book, Library, Sparkles, Fingerprint } from 'lucide-react';
+import { getWordMorphology, getGrammarColor } from '@/utils/sarf';
 
 interface WaqfData {
   wordIndex: number;
@@ -87,6 +88,58 @@ export default function AyahViewer({ text, waqfPoints, mode }: AyahViewerProps) 
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            {/* Morphological Analysis (Sarf) */}
+            {(() => {
+              const morph = getWordMorphology(words[selectedWordIdx]);
+              if (!morph) return null;
+              return (
+                <div style={{ 
+                  background: '#f8fafc', 
+                  padding: '1.2rem', 
+                  borderRadius: '12px', 
+                  border: '1px solid #e2e8f0',
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '1.5rem',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                }}>
+                  <div style={{ 
+                    background: 'white', 
+                    padding: '0.8rem', 
+                    borderRadius: '10px', 
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                    color: getGrammarColor(morph.grammar)
+                  }}>
+                    <Fingerprint size={24} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'baseline', marginBottom: '0.3rem' }}>
+                      <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: '500' }}>الهوية اللغوية:</span>
+                      <span style={{ 
+                        fontSize: '0.75rem', 
+                        padding: '2px 8px', 
+                        borderRadius: '4px', 
+                        background: getGrammarColor(morph.grammar) + '20',
+                        color: getGrammarColor(morph.grammar),
+                        fontWeight: 'bold'
+                      }}>{morph.grammar}</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '2rem' }}>
+                      <div>
+                        <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>الجذر:</span>
+                        <span style={{ fontSize: '1.1rem', fontWeight: 'bold', marginLeft: '0.5rem', color: '#1e293b' }}>{morph.root}</span>
+                      </div>
+                      <div>
+                        <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>الأصل:</span>
+                        <span style={{ fontSize: '1.1rem', fontWeight: 'bold', marginLeft: '0.5rem', color: '#1e293b' }}>{morph.lemma}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <button className="btn btn-sm btn-outline" style={{ fontSize: '0.8rem' }}>استعراض المشتقات</button>
+                </div>
+              );
+            })()}
+
             {currentPoints.length > 0 ? (
               currentPoints.map((p, idx) => (
                 <div key={idx} style={{ 
