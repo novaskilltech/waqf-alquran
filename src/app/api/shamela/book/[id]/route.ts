@@ -17,9 +17,9 @@ if (!fs.existsSync(CONFIG.DATA_DIR)) {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const bookId = params.id;
+  const bookId = (await params).id;
   const { searchParams } = new URL(request.url);
   const page = searchParams.get('page');
 
