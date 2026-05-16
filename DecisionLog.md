@@ -11,7 +11,9 @@
 | 2026-05-15 | **Optimisation Batch IA** | Lenteur du traitement séquentiel. | Passage en mode parallèle (concurrence x3). | NOVA-LEAD |
 | 2026-05-15 | **Correctif SQL Ayah** | Erreur de syntaxe (point-virgule prématuré). | Fichier `surahs_71_114.sql` corrigé et importé. | NOVA-LEAD |
 | 2026-05-15 | **Intégration Manar UI** | Besoin d'afficher les sources académiques. | Mise à jour de `AyahViewer.tsx` avec badges et couleurs. | NOVA-LEAD |
-
+| 2026-05-16 | **Intégration Shamela API** | Accès aux sources académiques (livres). | Création de la page `Library` et connexion `shamela-api`. | NOVA-LEAD |
+| 2026-05-16 | **Modèle IA Extraction** | Erreurs de timeout avec anciens scripts. | Utilisation de Gemini 2.0 Flash via OpenRouter. | NOVA-LEAD |
+| 2026-05-16 | **Navigation UI** | Retour au dashboard difficile depuis Mushaf/Admin. | Ajout de boutons "Home" dans les headers/sidebars. | NOVA-UX |
 ## État des Phases (NOVA SQUAD)
 
 - [x] **PHASE 1 : INTAKE** (Compréhension du besoin)
@@ -30,8 +32,8 @@
 ## Backlog Lot 1 (MVP)
 
 - [x] Ingestion Surates 71-114 (Texte).
-- [x] Extraction finale Manar al-Huda (Terminée à 95% - Sourates 71 à 114).
-    *Note : Quelques sourates (94, 104, 108) ignorées suite timeouts IA.*
+- [x] Extraction finale Manar al-Huda (Terminée à 100% - Sourates 71 à 114 avec corrections de la sourate 103).
 - [x] Module de classification sémantique par IA (Validé).
 - [x] Interface de visualisation des commentaires académiques (Prête).
-
+- [x] Module Bibliothèque Islamique (Intégration Shamela API en local).
+- [ ] Script d'extraction IA pour les sourates 1 à 70 (À exécuter).
