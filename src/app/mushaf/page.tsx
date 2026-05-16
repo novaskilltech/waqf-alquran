@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import AyahViewer from '@/components/quran/AyahViewer';
-import { Book, Sparkles, ChevronRight, ChevronLeft, Search } from 'lucide-react';
+import { Book, Sparkles, ChevronRight, ChevronLeft, Search, Home } from 'lucide-react';
 
 export default function MushafPage() {
   const [surah, setSurah] = useState(1);
@@ -46,6 +47,22 @@ export default function MushafPage() {
         boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <Link href="/" style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            width: '42px', 
+            height: '42px', 
+            borderRadius: '12px', 
+            background: '#fff9f0', 
+            border: '1px solid #d4af37',
+            color: '#d4af37',
+            textDecoration: 'none',
+            transition: 'all 0.2s ease',
+            flexShrink: 0
+          }}>
+            <Home size={20} />
+          </Link>
           <Book size={32} color="var(--primary-color)" />
           <h1 style={{ margin: 0, color: 'var(--primary-color)' }}>المصحف الشريف</h1>
         </div>

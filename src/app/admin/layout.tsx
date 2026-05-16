@@ -1,6 +1,6 @@
 import React from 'react';
 import "../../styles/globals.css";
-import { LayoutDashboard, FileText, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, FileText, Settings, LogOut, Home } from 'lucide-react';
 
 export default function AdminLayout({
   children,
@@ -21,6 +21,10 @@ export default function AdminLayout({
         </div>
         
         <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a href="/" className="btn" style={{ justifyContent: 'flex-start', color: 'var(--accent-color)', gap: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '1rem', marginBottom: '0.5rem' }}>
+            <Home size={20} />
+            الرئيسية
+          </a>
           <a href="/admin" className="btn" style={{ justifyContent: 'flex-start', color: 'white', gap: '1rem' }}>
             <LayoutDashboard size={20} />
             لوحة التحكم

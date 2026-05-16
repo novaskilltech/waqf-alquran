@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { BookOpen, Search, ShieldCheck, BarChart3, Settings } from 'lucide-react';
+import { BookOpen, Search, ShieldCheck, BarChart3, Settings, Library } from 'lucide-react';
 
 export default function HomePage() {
   const [stats, setStats] = useState({ total: 0, approved: 0, surahs: 114 });
@@ -70,6 +70,21 @@ export default function HomePage() {
             </div>
             <p style={{ color: '#666', lineHeight: '1.6' }}>
               ابحث عن آيات أو كلمات محددة واستعرض الأحكام العلمية المفصلة.
+            </p>
+          </div>
+        </Link>
+
+        {/* Bibliothèque Islamique */}
+        <Link href="/library" style={{ textDecoration: 'none' }}>
+          <div className="card hover-scale" style={{ height: '100%', borderTop: '4px solid #7c3aed' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+              <div style={{ background: '#f5f3ff', padding: '0.8rem', borderRadius: '12px', border: '1px solid #7c3aed' }}>
+                <Library color="#7c3aed" />
+              </div>
+              <h2 style={{ color: '#7c3aed' }}>المكتبة الإسلامية</h2>
+            </div>
+            <p style={{ color: '#666', lineHeight: '1.6' }}>
+              تصفح آلاف الكتب من المكتبة الشاملة واستعرض مصادر الوقف والابتداء.
             </p>
           </div>
         </Link>

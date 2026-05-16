@@ -38,3 +38,12 @@ model WaqfPoint {
   updatedAt    DateTime @updatedAt
   Ayah         Ayah     @relation(fields: [ayahId], references: [id])
 }
+
+model Morphology {
+  word    String  @id
+  root    String
+  lemma   String?
+  grammar String?
+
+  @@index([word])
+}
