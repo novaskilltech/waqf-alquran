@@ -3,7 +3,7 @@ const path = require('path');
 const https = require('https');
 
 const CONFIG = {
-  API_KEY: process.env.OPENROUTER_API_KEY || "YOUR_API_KEY_HERE",
+  API_KEY: process.env.OPENROUTER_API_KEY || "",
   API_HOST: "openrouter.ai",
   API_PATH: "/api/v1/chat/completions",
   MODEL: "google/gemini-2.0-flash-001",
@@ -73,9 +73,10 @@ Format JSON:
     };
 
     const req = https.request(options, (res) => {
-      let body = '';
-      res.on('data', (chunk) => body += chunk);
+      const chunks = [];
+      res.on('data', (chunk) => chunks.push(chunk));
       res.on('end', () => {
+        const body = Buffer.concat(chunks).toString('utf8');
         try {
           const json = JSON.parse(body);
           if (json.error) {

@@ -44,7 +44,7 @@ export default function LibraryPage() {
 
   // Check API status
   useEffect(() => {
-    fetch(`${SHAMELA_API_URL}/api/stats`)
+    fetch(`/api/shamela/stats`)
       .then(r => r.json())
       .then(d => {
         if (d.success) setApiStatus('online');
@@ -56,7 +56,7 @@ export default function LibraryPage() {
   // Fetch categories
   useEffect(() => {
     if (apiStatus !== 'online') return;
-    fetch(`${SHAMELA_API_URL}/api/categories`)
+    fetch(`/api/shamela/categories`)
       .then(r => r.json())
       .then(d => {
         if (d.success) setCategories(d.data || []);
@@ -74,7 +74,7 @@ export default function LibraryPage() {
     params.set('limit', limit.toString());
     params.set('offset', ((page - 1) * limit).toString());
 
-    fetch(`${SHAMELA_API_URL}/api/books?${params}`)
+    fetch(`/api/shamela/search?${params}`)
       .then(r => r.json())
       .then(d => {
         if (d.success) {
@@ -102,10 +102,13 @@ export default function LibraryPage() {
     setContentLoading(true);
     setBookContent(null);
     try {
-      const res = await fetch(`${SHAMELA_API_URL}/api/books/${book.id}/content`);
+      const res = await fetch(`/api/shamela/book/${book.id}`);
       const d = await res.json();
       if (d.success && d.data?.pages) {
         setBookContent(d.data.pages.slice(0, 50)); // First 50 pages
+      } else if (d.pages) {
+        // Fallback pour notre ancienne route qui renvoyait directement { pages, titles }
+        setBookContent(d.pages.slice(0, 50));
       }
     } catch (e) {
       console.error(e);

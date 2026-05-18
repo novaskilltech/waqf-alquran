@@ -3,6 +3,7 @@ import AdmZip from 'adm-zip';
 import Database from 'better-sqlite3';
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 
 const CONFIG = {
   API_KEY: "a81267-6a3bfd-15ea5d-47baac-33c9c2",
@@ -56,7 +57,7 @@ export async function GET(
         if (entry.entryName.endsWith('.db')) {
           const tableName = entry.entryName.replace('.db', '');
           const dbBuffer = entry.getData();
-          const tempDbPath = path.join(CONFIG.DATA_DIR, `temp_${bookId}_${Date.now()}.db`);
+          const tempDbPath = path.join(os.tmpdir(), `temp_${bookId}_${Date.now()}.db`);
 
           fs.writeFileSync(tempDbPath, dbBuffer);
           const db = new Database(tempDbPath);

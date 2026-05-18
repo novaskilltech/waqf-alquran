@@ -3,7 +3,7 @@ const path = require('path');
 const https = require('https');
 
 const CONFIG = {
-  AI_API_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbnYiOiJwcm9kdWN0aW9uIiwia2lsb1VzZXJJZCI6ImQ0ZmEzY2FlLTQxNWMtNDQxMi05NzM4LTZlZDk1NjUwOWIyMSIsImFwaVRva2VuUGVwcGVyIjpudWxsLCJ2ZXJzaW9uIjozLCJpYXQiOjE3Nzg4NjIyNzksImV4cCI6MTkzNjU0MjI3OX0.ztj8qODSAhdbgG4G-b-ttchrBNr6ndMJE_5z7NIOvbo",
+  AI_API_KEY: process.env.AI_PROVIDER_API_KEY || "",
   AI_URL: "https://api.kilo.ai/api/gateway/chat/completions",
   BOOK_PATH: path.join(process.cwd(), 'shamela_data', '6496.json')
 };

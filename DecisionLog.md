@@ -14,6 +14,9 @@
 | 2026-05-16 | **Intégration Shamela API** | Accès aux sources académiques (livres). | Création de la page `Library` et connexion `shamela-api`. | NOVA-LEAD |
 | 2026-05-16 | **Modèle IA Extraction** | Erreurs de timeout avec anciens scripts. | Utilisation de Gemini 2.0 Flash via OpenRouter. | NOVA-LEAD |
 | 2026-05-16 | **Navigation UI** | Retour au dashboard difficile depuis Mushaf/Admin. | Ajout de boutons "Home" dans les headers/sidebars. | NOVA-UX |
+| 2026-05-17 | **Correctif Vercel Build** | `better-sqlite3` plantait la compilation sur Vercel. | Ajout à `serverExternalPackages` et route API modifiée pour utiliser `/tmp`. | NOVA-DEVOPS |
+| 2026-05-17 | **Théorie Manar Al-Huda** | L'extraction markdown manquait des titres originaux. | Réécriture du script pour injecter la hiérarchie complète des titres Shamela. | NOVA-BE |
+
 ## État des Phases (NOVA SQUAD)
 
 - [x] **PHASE 1 : INTAKE** (Compréhension du besoin)
@@ -36,4 +39,5 @@
 - [x] Module de classification sémantique par IA (Validé).
 - [x] Interface de visualisation des commentaires académiques (Prête).
 - [x] Module Bibliothèque Islamique (Intégration Shamela API en local).
-- [ ] Script d'extraction IA pour les sourates 1 à 70 (À exécuter).
+- [ ] Script d'extraction IA pour les sourates 1 à 70 (À exécuter localement).
+- [ ] Téléchargement des autres livres Shamela via serveur `shamela-api` local.

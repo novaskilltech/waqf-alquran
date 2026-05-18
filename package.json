@@ -18,7 +18,8 @@
     "lucide-react": "latest",
     "next": "latest",
     "react": "latest",
-    "react-dom": "latest"
+    "react-dom": "latest",
+    "shamela": "^1.5.3"
   },
   "devDependencies": {
     "@types/node": "latest",
